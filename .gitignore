@@ -218,8 +218,8 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Datos
-data/raw/
-data/processed/
+#data/raw/
+#data/processed/
 *.pkl
 
 # Jupyter checkpoints
