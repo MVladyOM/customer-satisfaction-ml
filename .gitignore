@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Datos
+data/raw/
+data/processed/
+*.pkl
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
