@@ -63,8 +63,8 @@ def build_master_table(dfs: dict[str, pd.DataFrame]) -> pd.DataFrame:
         how="left"
     )
 
-    # 4. Reviews — solo score y fechas
-    reviews = dfs["reviews"][["order_id", "review_score"]].drop_duplicates("order_id")
+    # 4. Reviews
+    reviews = dfs["reviews"][["order_id", "review_score","review_comment_message"]].drop_duplicates("order_id")
 
     # 5. Merge central
     master = (
