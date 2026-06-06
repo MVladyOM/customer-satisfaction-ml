@@ -1,0 +1,30 @@
+{
+  "n_features": 25,
+  "features": [
+    "interaccion_retraso_items",
+    "delivery_delay_days",
+    "interaccion_precio_tarde",
+    "delay_ratio",
+    "actual_delivery_days",
+    "delivered_on_time",
+    "order_item_count",
+    "is_multi_item",
+    "unique_sellers",
+    "interaccion_entrega_flete",
+    "total_freight_value",
+    "dispatch_time_hours",
+    "te_product_category_name_english",
+    "promised_delivery_days",
+    "log_payment_value",
+    "freight_ratio",
+    "product_volume_cm3",
+    "total_price",
+    "product_height_cm",
+    "product_weight_g",
+    "product_name_lenght",
+    "product_width_cm",
+    "product_length_cm",
+    "purchase_dayofweek",
+    "seller_customer_same_state"
+  ]
+}

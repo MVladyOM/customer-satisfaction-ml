@@ -1,0 +1,103 @@
+{
+  "script": "01_carga_datos",
+  "timestamp": "2026-06-06T09:09:16.922351",
+  "tablas": {
+    "orders": {
+      "filas": 99441,
+      "columnas": 8,
+      "nulos_total": 4908,
+      "columnas_con_nulos": 3,
+      "duplicados": 0,
+      "nulos_detalle": {
+        "order_approved_at": 160,
+        "order_delivered_carrier_date": 1783,
+        "order_delivered_customer_date": 2965
+      }
+    },
+    "reviews": {
+      "filas": 99224,
+      "columnas": 7,
+      "nulos_total": 145903,
+      "columnas_con_nulos": 2,
+      "duplicados": 0,
+      "nulos_detalle": {
+        "review_comment_title": 87656,
+        "review_comment_message": 58247
+      }
+    },
+    "items": {
+      "filas": 112650,
+      "columnas": 7,
+      "nulos_total": 0,
+      "columnas_con_nulos": 0,
+      "duplicados": 0,
+      "nulos_detalle": {}
+    },
+    "payments": {
+      "filas": 103886,
+      "columnas": 5,
+      "nulos_total": 0,
+      "columnas_con_nulos": 0,
+      "duplicados": 0,
+      "nulos_detalle": {}
+    },
+    "customers": {
+      "filas": 99441,
+      "columnas": 5,
+      "nulos_total": 0,
+      "columnas_con_nulos": 0,
+      "duplicados": 0,
+      "nulos_detalle": {}
+    },
+    "products": {
+      "filas": 32951,
+      "columnas": 9,
+      "nulos_total": 2448,
+      "columnas_con_nulos": 8,
+      "duplicados": 0,
+      "nulos_detalle": {
+        "product_category_name": 610,
+        "product_name_lenght": 610,
+        "product_description_lenght": 610,
+        "product_photos_qty": 610,
+        "product_weight_g": 2,
+        "product_length_cm": 2,
+        "product_height_cm": 2,
+        "product_width_cm": 2
+      }
+    },
+    "sellers": {
+      "filas": 3095,
+      "columnas": 4,
+      "nulos_total": 0,
+      "columnas_con_nulos": 0,
+      "duplicados": 0,
+      "nulos_detalle": {}
+    },
+    "geolocation": {
+      "filas": 1000163,
+      "columnas": 5,
+      "nulos_total": 0,
+      "columnas_con_nulos": 0,
+      "duplicados": 261831,
+      "nulos_detalle": {}
+    },
+    "translation": {
+      "filas": 71,
+      "columnas": 2,
+      "nulos_total": 0,
+      "columnas_con_nulos": 0,
+      "duplicados": 0,
+      "nulos_detalle": {}
+    }
+  },
+  "resumen": {
+    "tablas_cargadas": 9,
+    "tablas_esperadas": 9,
+    "tablas_limpias": 5,
+    "total_filas": 1550922,
+    "total_nulos": 153259,
+    "total_duplicados": 261831,
+    "estado_general": "OK"
+  }
+}
