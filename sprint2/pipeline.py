@@ -3,6 +3,11 @@ import sys
 import time
 from pathlib import Path
 
+# Directorio raíz del proyecto (un nivel arriba de sprint2/)
+ROOT = Path(__file__).resolve().parent.parent
+# Directorio donde viven los scripts del sprint
+SPRINT_DIR = Path(__file__).resolve().parent
+
 # Archivos raw que deben existir antes de arrancar
 RAW_ESPERADOS = [
     "data/raw/olist_customers_dataset.csv",
@@ -52,13 +57,32 @@ PIPELINE = [
             "data/master/y_live.csv",
         ],
     },
+    {
+        "script": "05_optuna.py",
+        "outputs": [
+            "data/reportes/resultados_optuna.json",
+            "data/reportes/mejores_params.json",
+            "data/reportes/modelos_optuna.pkl",
+            "data/reportes/estudios_optuna.pkl",
+            "data/reportes/estado_optuna.json",
+        ],
+    },
+    {
+        "script": "06_graficos.py",
+        "outputs": [
+            "reports/01_comparacion_metricas.png",
+            "reports/09_optuna_convergencia.png",
+            "reports/11_feature_importance_nativa.png",
+            "reports/12_feature_importance_comparativo.png",
+        ],
+    },
 ]
 
 
 def verificar_archivos(rutas: list[str], contexto: str) -> bool:
     todos_ok = True
     for ruta in rutas:
-        if not Path(ruta).exists():
+        if not (ROOT / ruta).exists():
             print(f"  ⚠️  No encontrado: {ruta}")
             todos_ok = False
     return todos_ok
@@ -83,7 +107,11 @@ def main():
         print(f"{'='*55}")
 
         t0 = time.time()
-        resultado = subprocess.run([sys.executable, script], check=False)
+        resultado = subprocess.run(
+            [sys.executable, str(SPRINT_DIR / script)],
+            cwd=ROOT,
+            check=False,
+        )
         elapsed = time.time() - t0
 
         if resultado.returncode != 0:
