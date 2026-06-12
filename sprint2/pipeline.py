@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import subprocess
 import sys
 import time
@@ -55,25 +57,6 @@ PIPELINE = [
             "data/master/y_backtest.csv",
             "data/master/X_live.csv",
             "data/master/y_live.csv",
-        ],
-    },
-    {
-        "script": "05_optuna.py",
-        "outputs": [
-            "data/reportes/resultados_optuna.json",
-            "data/reportes/mejores_params.json",
-            "data/reportes/modelos_optuna.pkl",
-            "data/reportes/estudios_optuna.pkl",
-            "data/reportes/estado_optuna.json",
-        ],
-    },
-    {
-        "script": "06_graficos.py",
-        "outputs": [
-            "reports/01_comparacion_metricas.png",
-            "reports/09_optuna_convergencia.png",
-            "reports/11_feature_importance_nativa.png",
-            "reports/12_feature_importance_comparativo.png",
         ],
     },
 ]
