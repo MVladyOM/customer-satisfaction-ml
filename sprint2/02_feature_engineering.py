@@ -251,14 +251,6 @@ def features_complejidad(base: pd.DataFrame) -> pd.DataFrame:
     # Pago en cuotas
     base["uses_installments"] = (base["payment_installments"] > 1).astype(int)
 
-    # Pago en cuotas (flag)
-    base["pago_en_cuotas"] = (base["payment_installments"].fillna(1) > 1).astype(int)
-
-    # Precio promedio por item
-    base["precio_por_item"] = (
-        base["total_price"] / base["order_item_count"].replace(0, np.nan)
-    )
-
     # Log del valor (reduce asimetría)
     base["log_payment_value"] = np.log1p(base["payment_value"].fillna(0))
     base["log_freight_value"] = np.log1p(base["total_freight_value"].fillna(0))
@@ -456,6 +448,7 @@ def crear_target(base: pd.DataFrame) -> pd.DataFrame:
     base["review_score"] = pd.to_numeric(base["review_score"], errors="coerce")
     base = base.dropna(subset=["review_score"]).copy()
     base["satisfecho"] = (base["review_score"] >= REVIEW_SCORE_UMBRAL).astype(int)
+    base.drop(columns=["review_score"], inplace=True)
 
     dist = base["satisfecho"].value_counts(normalize=True)
     print(f"  Satisfecho (1)   : {dist.get(1, 0):.1%}")
@@ -473,7 +466,7 @@ COLS_WINSORIZAR = [
     "dispatch_time_hours", "total_price", "total_freight_value",
     "payment_value", "freight_ratio", "delay_ratio",
     "product_weight_g", "product_volume_cm3", "comment_length",
-    "precio_por_item", "interaccion_retraso_items",
+    "interaccion_retraso_items",
     "interaccion_precio_tarde", "interaccion_entrega_flete",
 ]
 
