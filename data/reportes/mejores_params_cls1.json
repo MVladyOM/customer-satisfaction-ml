@@ -1,0 +1,22 @@
+{
+  "Logistic Regression": {
+    "C": 0.0010000980017098495,
+    "solver": "saga",
+    "class_weight": null
+  },
+  "Hist Gradient Boosting": {
+    "max_iter": 235,
+    "max_depth": 2,
+    "learning_rate": 0.2032403020298876,
+    "max_leaf_nodes": 108,
+    "l2_regularization": 5.143944798722955e-09,
+    "class_weight": null
+  },
+  "LinearSVM": {
+    "C": 0.12832070467901463,
+    "loss": "squared_hinge",
+    "tol": 0.032316763596176426,
+    "class_weight": "balanced",
+    "calibration_method": "isotonic"
+  }
+}

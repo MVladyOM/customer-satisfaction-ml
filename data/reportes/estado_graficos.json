@@ -1,0 +1,25 @@
+{
+  "script": "07_graficos",
+  "timestamp": "2026-06-17T22:47:29.252647",
+  "duracion_seg": 16.69,
+  "modelo_ganador": "Hist Gradient Boosting",
+  "graficos_generados": [
+    "01_comparacion_metricas.png",
+    "02_roc_val.png",
+    "03_roc_backtest.png",
+    "04_pr_val.png",
+    "05_pr_backtest.png",
+    "06_confusion_val.png",
+    "07_confusion_backtest.png",
+    "08_dist_probabilidades.png",
+    "09_optuna_convergencia.png",
+    "10_optuna_hiperparametros.png",
+    "11_feature_importance_nativa.png",
+    "12_feature_importance_comparativo.png",
+    "13_importancia_antes_despues.png",
+    "14_metricas_desbalanceo.png",
+    "15_overfitting.png",
+    "16_tabla_metricas_top3.png"
+  ],
+  "directorio_salida": "reports"
+}

@@ -1,0 +1,19 @@
+{
+  "script": "05_baseline",
+  "timestamp": "2026-06-17T22:25:54.485744",
+  "duracion_seg": 52.24,
+  "seed": 2357,
+  "umbral_overfit": 0.05,
+  "n_modelos": 8,
+  "n_overfit": 3,
+  "mejor_modelo": "HGBC",
+  "auc_mejor": 0.7666,
+  "mcc_mejor": 0.476,
+  "bal_acc_mejor": 0.6741,
+  "gmean_mejor": 0.6035,
+  "f1_0_mejor": 0.5184,
+  "f1_1_mejor": 0.8819,
+  "f1_macro_mejor": 0.7001,
+  "overfit_mejor": false,
+  "delta_auc_mejor": -0.0161
+}

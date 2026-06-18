@@ -1,12 +1,12 @@
 {
   "script": "03_limpieza",
-  "timestamp": "2026-06-06T09:09:34.834160",
+  "timestamp": "2026-06-17T11:31:30.829250",
   "shape_original": {
     "filas": 95832,
-    "columnas": 68
+    "columnas": 65
   },
   "paso_1_eliminacion": {
-    "eliminadas_total": 18,
+    "eliminadas_total": 17,
     "eliminadas_ids": [
       "order_id",
       "customer_id",
@@ -21,7 +21,6 @@
       "purchase_year_month"
     ],
     "eliminadas_leakage": [
-      "review_score",
       "review_comment_message",
       "review_comment_title",
       "has_comment",
@@ -33,7 +32,9 @@
       "customer_city",
       "seller_city"
     ],
-    "no_encontradas": []
+    "no_encontradas": [
+      "review_score"
+    ]
   },
   "paso_2_missings_altos": {},
   "paso_3_imputacion": {
@@ -100,17 +101,17 @@
     "product_photos_qty": {
       "tipo": "mediana",
       "valor": 2.0,
-      "nulos_imputados": 1350
+      "nulos_imputados": 1352
     },
     "product_description_lenght": {
       "tipo": "mediana",
       "valor": 608.0,
-      "nulos_imputados": 1350
+      "nulos_imputados": 1352
     },
     "product_name_lenght": {
       "tipo": "mediana",
       "valor": 52.0,
-      "nulos_imputados": 1350
+      "nulos_imputados": 1352
     },
     "product_volume_cm3": {
       "tipo": "mediana",
@@ -125,7 +126,7 @@
     "product_category_name_english": {
       "tipo": "constante",
       "valor": "desconocido",
-      "nulos_imputados": 1370
+      "nulos_imputados": 1372
     }
   },
   "paso_4_categorias_raras": {
@@ -134,8 +135,8 @@
       "ejemplos": [
         "home_appliances",
         "construction_tools_construction",
-        "small_appliances",
         "musical_instruments",
+        "small_appliances",
         "books_general_interest"
       ],
       "cardinalidad_final": 23
@@ -174,7 +175,7 @@
     "nulos_residuales": 0,
     "shape_final": {
       "filas": 95832,
-      "columnas": 50
+      "columnas": 48
     },
     "pct_satisfecho": 0.7893,
     "columnas_finales": [
@@ -205,8 +206,6 @@
       "total_order_value",
       "is_multi_seller",
       "is_multi_item",
-      "pago_en_cuotas",
-      "precio_por_item",
       "log_payment_value",
       "log_freight_value",
       "seller_state",
@@ -230,8 +229,8 @@
       "satisfecho"
     ],
     "tipos_datos": {
-      "order_status": "str",
-      "order_purchase_timestamp": "str",
+      "order_status": "object",
+      "order_purchase_timestamp": "object",
       "actual_delivery_days": "float64",
       "delivery_delay_days": "float64",
       "delivered_on_time": "int64",
@@ -253,16 +252,14 @@
       "payment_value": "float64",
       "payment_installments": "float64",
       "payment_types_count": "float64",
-      "payment_type": "str",
+      "payment_type": "object",
       "total_order_value": "float64",
       "is_multi_seller": "int64",
       "is_multi_item": "int64",
-      "pago_en_cuotas": "int64",
-      "precio_por_item": "float64",
       "log_payment_value": "float64",
       "log_freight_value": "float64",
-      "seller_state": "str",
-      "product_category_name_english": "str",
+      "seller_state": "object",
+      "product_category_name_english": "object",
       "product_weight_g": "float64",
       "product_length_cm": "float64",
       "product_height_cm": "float64",
@@ -272,8 +269,8 @@
       "product_name_lenght": "float64",
       "product_volume_cm3": "float64",
       "has_product_photo": "int64",
-      "customer_state": "str",
-      "customer_region": "str",
+      "customer_state": "object",
+      "customer_region": "object",
       "customer_high_risk_state": "int64",
       "seller_customer_same_state": "int64",
       "interaccion_retraso_items": "float64",
@@ -282,5 +279,5 @@
       "satisfecho": "int64"
     }
   },
-  "duracion_seg": 2.2
+  "duracion_seg": 2.66
 }

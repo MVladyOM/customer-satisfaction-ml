@@ -1,6 +1,6 @@
 {
   "script": "01_carga_datos",
-  "timestamp": "2026-06-06T09:09:16.922351",
+  "timestamp": "2026-06-16T14:04:32.559940",
   "tablas": {
     "orders": {
       "filas": 99441,

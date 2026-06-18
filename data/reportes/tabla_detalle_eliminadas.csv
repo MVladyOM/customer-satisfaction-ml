@@ -8,26 +8,23 @@ paso,metodo,threshold,feature_eliminada,paso_elegido
 3,correlation_method,0.8,total_order_value,False
 3,correlation_method,0.8,is_multi_seller,False
 3,correlation_method,0.8,is_multi_item,False
-3,correlation_method,0.8,precio_por_item,False
 3,correlation_method,0.8,log_payment_value,False
 3,correlation_method,0.8,log_freight_value,False
 3,correlation_method,0.8,interaccion_retraso_items,False
 3,correlation_method,0.8,interaccion_precio_tarde,False
-3,correlation_method,0.9,max_price_item,True
-3,correlation_method,0.9,min_price_item,True
-3,correlation_method,0.9,payment_value,True
-3,correlation_method,0.9,total_order_value,True
-3,correlation_method,0.9,is_multi_seller,True
-3,correlation_method,0.9,precio_por_item,True
-3,correlation_method,0.9,log_freight_value,True
+3,correlation_method,0.9,max_price_item,False
+3,correlation_method,0.9,min_price_item,False
+3,correlation_method,0.9,payment_value,False
+3,correlation_method,0.9,total_order_value,False
+3,correlation_method,0.9,is_multi_seller,False
+3,correlation_method,0.9,log_freight_value,False
 3,correlation_method,0.95,max_price_item,False
 3,correlation_method,0.95,min_price_item,False
 3,correlation_method,0.95,payment_value,False
 3,correlation_method,0.95,is_multi_seller,False
-3,correlation_method,0.95,precio_por_item,False
-3,correlation_method,0.99,max_price_item,False
-3,correlation_method,0.99,min_price_item,False
-3,correlation_method,0.99,payment_value,False
+3,correlation_method,0.99,max_price_item,True
+3,correlation_method,0.99,min_price_item,True
+3,correlation_method,0.99,payment_value,True
 4,univariante_method,0.01,approval_time_hours,True
 4,univariante_method,0.01,purchase_hour,True
 4,univariante_method,0.01,avg_price_per_item,True
@@ -42,6 +39,7 @@ paso,metodo,threshold,feature_eliminada,paso_elegido
 4,univariante_method,0.02,avg_price_per_item,False
 4,univariante_method,0.02,unique_sellers,False
 4,univariante_method,0.02,payment_types_count,False
+4,univariante_method,0.02,is_multi_seller,False
 4,univariante_method,0.02,product_weight_g,False
 4,univariante_method,0.02,product_length_cm,False
 4,univariante_method,0.02,product_height_cm,False
@@ -63,8 +61,9 @@ paso,metodo,threshold,feature_eliminada,paso_elegido
 4,univariante_method,0.05,freight_ratio,False
 4,univariante_method,0.05,payment_installments,False
 4,univariante_method,0.05,payment_types_count,False
+4,univariante_method,0.05,total_order_value,False
+4,univariante_method,0.05,is_multi_seller,False
 4,univariante_method,0.05,is_multi_item,False
-4,univariante_method,0.05,pago_en_cuotas,False
 4,univariante_method,0.05,log_payment_value,False
 4,univariante_method,0.05,product_weight_g,False
 4,univariante_method,0.05,product_length_cm,False
@@ -77,12 +76,16 @@ paso,metodo,threshold,feature_eliminada,paso_elegido
 4,univariante_method,0.05,has_product_photo,False
 4,univariante_method,0.05,customer_high_risk_state,False
 4,univariante_method,0.05,te_product_category_name_english,False
+6,rf_importance_method [EXTRA],top_20,total_order_value,False
 6,rf_importance_method [EXTRA],top_20,product_name_lenght,False
+6,rf_importance_method [EXTRA],top_20,product_height_cm,False
+6,rf_importance_method [EXTRA],top_20,total_price,False
 6,rf_importance_method [EXTRA],top_20,product_width_cm,False
 6,rf_importance_method [EXTRA],top_20,product_length_cm,False
 6,rf_importance_method [EXTRA],top_20,purchase_dayofweek,False
-6,rf_importance_method [EXTRA],top_20,seller_customer_same_state,False
 6,rf_importance_method [EXTRA],top_20,payment_installments,False
-6,rf_importance_method [EXTRA],top_20,pago_en_cuotas,False
-6,rf_importance_method [EXTRA],top_25,payment_installments,True
-6,rf_importance_method [EXTRA],top_25,pago_en_cuotas,True
+6,rf_importance_method [EXTRA],top_20,seller_customer_same_state,False
+6,rf_importance_method [EXTRA],top_25,product_length_cm,False
+6,rf_importance_method [EXTRA],top_25,purchase_dayofweek,False
+6,rf_importance_method [EXTRA],top_25,payment_installments,False
+6,rf_importance_method [EXTRA],top_25,seller_customer_same_state,False
