@@ -52,8 +52,8 @@ UMBRAL_CATEGORIA   = 0.01   # agrupar categoría si frecuencia < 1%
 # ---------------------------------------------------------------------------
 
 # IDs: no tienen poder predictivo directo
+# order_id se conserva como identificador para trazabilidad en y_*
 COLS_IDS = [
-    "order_id",
     "customer_id",
     "seller_id",
     "product_id",

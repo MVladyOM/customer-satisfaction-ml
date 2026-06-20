@@ -51,6 +51,7 @@ Salida  : data/master/X_train.csv / y_train.csv
 """
 
 import os
+import sys
 import json
 import warnings
 import numpy as np
@@ -62,6 +63,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 
 warnings.filterwarnings("ignore")
+
+# Forzar UTF-8 en stdout para compatibilidad con Windows
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 # ---------------------------------------------------------------------------
 # Rutas
@@ -117,8 +122,73 @@ def cargar_master() -> pd.DataFrame:
         )
     df = pd.read_csv(ruta, low_memory=False)
     df[COL_FECHA] = pd.to_datetime(df[COL_FECHA], errors="coerce")
-    print(
-        f"  Master limpia cargada: {df.shape[0]:,} filas × {df.shape[1]} columnas")
+
+    print(f"  Master limpia cargada: {df.shape[0]:,} filas × {df.shape[1]} columnas\n")
+
+    # ── Reporte de columnas y nulos ──────────────────────────────────────────
+    null_counts = df.isnull().sum()
+    null_pct    = (null_counts / len(df) * 100).round(2)
+
+    ancho_col  = max(len(c) for c in df.columns) + 2
+    print(f"  {'#':<5} {'Columna':<{ancho_col}} {'Dtype':<15} {'Nulos':>8} {'%Nulos':>8}  Estado")
+    print("  " + "-" * (ancho_col + 45))
+
+    cols_con_nulos = 0
+    for i, col in enumerate(df.columns, 1):
+        n_null = null_counts[col]
+        pct    = null_pct[col]
+        estado = "OK" if n_null == 0 else f"⚠  {pct:.2f}% nulos"
+        if n_null > 0:
+            cols_con_nulos += 1
+        print(f"  {i:<5} {col:<{ancho_col}} {str(df[col].dtype):<15} {n_null:>8,} {pct:>7.2f}%  {estado}")
+
+    print("  " + "-" * (ancho_col + 45))
+    total_nulos = null_counts.sum()
+    print(f"\n  Resumen nulos:")
+    print(f"    Columnas con nulos : {cols_con_nulos} / {df.shape[1]}")
+    print(f"    Total celdas nulas : {total_nulos:,}  "
+          f"({total_nulos / df.size * 100:.3f}% del total)")
+    if cols_con_nulos == 0:
+        print("    Sin valores nulos detectados.")
+    print()
+
+    # ── Corrección automática de nulos ──────────────────────────────────────
+    if total_nulos > 0:
+        print("  Corrigiendo nulos detectados:")
+        filas_antes = len(df)
+
+        for col in df.columns:
+            n = null_counts[col]
+            if n == 0:
+                continue
+
+            if col == COL_FECHA:
+                # Fecha requerida para el split temporal — eliminar esas filas
+                df.dropna(subset=[col], inplace=True)
+                eliminadas = filas_antes - len(df)
+                print(f"    {col:<{ancho_col}} → eliminadas {eliminadas:,} filas "
+                      f"(fecha nula impide split temporal)")
+
+            elif pd.api.types.is_numeric_dtype(df[col]):
+                fill_val = df[col].median()
+                df[col].fillna(fill_val, inplace=True)
+                print(f"    {col:<{ancho_col}} → {n:,} nulos imputados con mediana "
+                      f"= {fill_val:.4f}")
+
+            else:
+                moda = df[col].mode()
+                fill_val = moda.iloc[0] if not moda.empty else "Unknown"
+                df[col].fillna(fill_val, inplace=True)
+                print(f"    {col:<{ancho_col}} → {n:,} nulos imputados con moda "
+                      f"= '{fill_val}'")
+
+        nulos_restantes = df.isnull().sum().sum()
+        print(f"\n    Nulos restantes tras corrección : {nulos_restantes}")
+        if len(df) < filas_antes:
+            print(f"    Filas eliminadas (fecha nula)   : {filas_antes - len(df):,}")
+        print(f"    Shape final                     : {df.shape[0]:,} filas × {df.shape[1]} columnas")
+        print()
+
     return df
 
 
@@ -134,10 +204,10 @@ def split_temporal(df: pd.DataFrame) -> tuple:
         df[COL_FECHA] <= FECHA_FIN_BACKTEST)
     mask_live = df[COL_FECHA] > FECHA_FIN_BACKTEST
 
-    train = df[mask_train].copy()
-    val = df[mask_val].copy()
-    backtest = df[mask_backtest].copy()
-    live = df[mask_live].copy()
+    train    = df[mask_train].copy().reset_index(drop=True)
+    val      = df[mask_val].copy().reset_index(drop=True)
+    backtest = df[mask_backtest].copy().reset_index(drop=True)
+    live     = df[mask_live].copy().reset_index(drop=True)
 
     for nombre, parte in [("Train", train), ("Val", val),
                           ("Backtest", backtest), ("Live", live)]:
@@ -152,7 +222,7 @@ def split_temporal(df: pd.DataFrame) -> tuple:
 
 def separar_Xy(df: pd.DataFrame) -> tuple:
     y = df["satisfecho"].copy()
-    X = df.drop(columns=["satisfecho", COL_FECHA], errors="ignore")
+    X = df.drop(columns=["satisfecho", COL_FECHA, "order_id"], errors="ignore").copy()
     return X, y
 
 
@@ -611,26 +681,72 @@ def seleccion_de_variables(
 
 
 def guardar_splits(
-    X_train, y_train, X_val, y_val,
-    X_backtest, y_backtest, X_live, y_live,
+    X_train, y_train,
+    X_val, y_val,
+    X_backtest, y_backtest,
+    X_live, y_live,
     features_finales
 ) -> None:
     os.makedirs(MASTER_PATH, exist_ok=True)
+
     splits = {
         "X_train": X_train[features_finales],
-        "y_train": y_train,
+        "y_train": y_train.to_frame(),
         "X_val": X_val[features_finales],
-        "y_val": y_val,
+        "y_val": y_val.to_frame(),
         "X_backtest": X_backtest[features_finales],
-        "y_backtest": y_backtest,
+        "y_backtest": y_backtest.to_frame(),
         "X_live": X_live[features_finales],
-        "y_live": y_live,
+        "y_live": y_live.to_frame(),
     }
     for nombre, datos in splits.items():
-        ruta = os.path.join(MASTER_PATH, f"{nombre}.csv")
-        datos.to_csv(ruta, index=False)
+        ruta_csv  = os.path.join(MASTER_PATH, f"{nombre}.csv")
+        ruta_xlsx = os.path.join(MASTER_PATH, f"{nombre}.xlsx")
         shape_str = str(datos.shape) if hasattr(datos, "shape") else ""
-        print(f"  Guardado: {nombre}.csv  {shape_str}")
+        intentos = 0
+        while True:
+            try:
+                datos.to_csv(ruta_csv, index=False, encoding="utf-8")
+                print(f"  Guardado: {nombre}.csv  {shape_str}")
+                break
+            except PermissionError:
+                intentos += 1
+                if intentos == 1:
+                    print(f"\n  [AVISO] '{nombre}.csv' esta abierto en otro programa (Excel?).")
+                    print(f"          Cierra el archivo y presiona ENTER para reintentar...")
+                    input()
+                elif intentos > 3:
+                    raise PermissionError(
+                        f"No se pudo guardar '{ruta_csv}' tras 3 intentos. "
+                        f"Cierra el archivo manualmente y vuelve a ejecutar."
+                    )
+                else:
+                    print(f"          Reintentando ({intentos}/3)... presiona ENTER.")
+                    input()
+        # Guardar también en XLSX para visualización
+        intentos_x = 0
+        while True:
+            try:
+                df_xlsx = datos.reset_index(drop=True) if isinstance(datos, pd.Series) else datos
+                if isinstance(datos, pd.Series):
+                    df_xlsx = datos.to_frame()
+                df_xlsx.to_excel(ruta_xlsx, index=False, engine="openpyxl")
+                print(f"  Guardado: {nombre}.xlsx  {shape_str}")
+                break
+            except PermissionError:
+                intentos_x += 1
+                if intentos_x == 1:
+                    print(f"\n  [AVISO] '{nombre}.xlsx' esta abierto en Excel. Cierra y presiona ENTER...")
+                    input()
+                elif intentos_x > 3:
+                    print(f"  [AVISO] No se pudo guardar '{nombre}.xlsx'. Continúa con CSV.")
+                    break
+                else:
+                    print(f"          Reintentando ({intentos_x}/3)... presiona ENTER.")
+                    input()
+            except Exception as e:
+                print(f"  [AVISO] No se pudo guardar '{nombre}.xlsx': {e}")
+                break
 
 
 def guardar_reportes(features_finales, tabla, estado) -> None:
@@ -678,6 +794,20 @@ def guardar_reportes(features_finales, tabla, estado) -> None:
 # MAIN
 # ---------------------------------------------------------------------------
 
+def _assert_sin_nulos(paso: str, **dfs):
+    """Aborta el script si cualquier DataFrame tiene nulos."""
+    for nombre, df in dfs.items():
+        n = int(df.isnull().sum().sum())
+        if n > 0:
+            cols = df.columns[df.isnull().any()].tolist()
+            raise ValueError(
+                f"\n[ERROR NULOS] Paso '{paso}' — '{nombre}' tiene {n} nulos "
+                f"en columnas: {cols}\n"
+                f"Verifica que master_table_limpia.csv este actualizado "
+                f"(ejecuta 03_limpieza.py primero)."
+            )
+
+
 def main():
     inicio = datetime.now()
     print("=" * 80)
@@ -687,26 +817,37 @@ def main():
 
     print("\n[1] Cargando master table limpia …")
     df = cargar_master()
+    _assert_sin_nulos("carga", master=df)
 
     print("\n[2] Split temporal …")
     train, val, backtest, live = split_temporal(df)
+    _assert_sin_nulos("split", train=train, val=val, backtest=backtest, live=live)
 
     print("\n[3] Separando X / y …")
-    X_train, y_train = separar_Xy(train)
-    X_val,   y_val = separar_Xy(val)
+    X_train,    y_train    = separar_Xy(train)
+    X_val,      y_val      = separar_Xy(val)
     X_backtest, y_backtest = separar_Xy(backtest)
-    X_live,     y_live = separar_Xy(live)
+    X_live,     y_live     = separar_Xy(live)
     print(f"  X_train shape: {X_train.shape}")
+    _assert_sin_nulos("sep_Xy",
+                      X_train=X_train, X_val=X_val,
+                      X_backtest=X_backtest, X_live=X_live)
 
     print("\n[4] Target Encoding (fit en train) …")
     X_train, X_val, X_backtest, X_live, te_maps = aplicar_target_encoding(
         X_train, y_train, X_val, X_backtest, X_live
     )
+    _assert_sin_nulos("target_encoding",
+                      X_train=X_train, X_val=X_val,
+                      X_backtest=X_backtest, X_live=X_live)
 
     print("\n[5] StandardScaler (fit en train) …")
     X_train, X_val, X_backtest, X_live, scaler, cols_num = aplicar_scaler(
         X_train, X_val, X_backtest, X_live
     )
+    _assert_sin_nulos("scaler",
+                      X_train=X_train, X_val=X_val,
+                      X_backtest=X_backtest, X_live=X_live)
 
     print("\n[6] Eliminando columnas object residuales …")
     cols_object = X_train.select_dtypes(
@@ -717,6 +858,9 @@ def main():
             df_part.drop(columns=cols_object, inplace=True, errors="ignore")
     else:
         print("  Sin columnas object residuales.")
+    _assert_sin_nulos("drop_object",
+                      X_train=X_train, X_val=X_val,
+                      X_backtest=X_backtest, X_live=X_live)
 
     print("\n[7] Selección de variables …")
     print("=" * 80)
@@ -727,8 +871,10 @@ def main():
 
     print("\n[8] Guardando splits …")
     guardar_splits(
-        X_train, y_train, X_val, y_val,
-        X_backtest, y_backtest, X_live, y_live,
+        X_train, y_train,
+        X_val, y_val,
+        X_backtest, y_backtest,
+        X_live, y_live,
         features_finales
     )
 
@@ -807,6 +953,59 @@ def main():
     print(f"\nFeatures finales seleccionadas : {len(features_finales)}")
     print(f"Features finales               : {features_finales}")
     print(f"Duración total                 : {estado['duracion_seg']}s")
+
+    # ── Verificación final de integridad ─────────────────────────────────────
+    print("\n" + "=" * 60)
+    print("VERIFICACION FINAL DE INTEGRIDAD")
+    print("=" * 60)
+
+    splits_guardados = {
+        "X_train":    (os.path.join(MASTER_PATH, "X_train.csv"),    len(X_train)),
+        "y_train":    (os.path.join(MASTER_PATH, "y_train.csv"),    len(y_train)),
+        "X_val":      (os.path.join(MASTER_PATH, "X_val.csv"),      len(X_val)),
+        "y_val":      (os.path.join(MASTER_PATH, "y_val.csv"),      len(y_val)),
+        "X_backtest": (os.path.join(MASTER_PATH, "X_backtest.csv"), len(X_backtest)),
+        "y_backtest": (os.path.join(MASTER_PATH, "y_backtest.csv"), len(y_backtest)),
+        "X_live":     (os.path.join(MASTER_PATH, "X_live.csv"),     len(X_live)),
+        "y_live":     (os.path.join(MASTER_PATH, "y_live.csv"),     len(y_live)),
+    }
+
+    total_filas = 0
+    errores = []
+    print(f"  {'Archivo':<22} {'Filas':>8}  {'Nulos':>6}  {'Cols':>5}  Estado")
+    print("  " + "-" * 55)
+
+    for nombre, (ruta, filas_mem) in splits_guardados.items():
+        df_check = pd.read_csv(ruta, low_memory=False)
+        nulos    = int(df_check.isnull().sum().sum())
+        cols     = df_check.shape[1]
+        ok_filas = df_check.shape[0] == filas_mem
+        ok_nulos = nulos == 0
+
+        estado_str = "OK" if (ok_filas and ok_nulos) else ""
+        if not ok_filas:
+            estado_str += f" [!] filas disco={df_check.shape[0]} vs memoria={filas_mem}"
+            errores.append(nombre)
+        if not ok_nulos:
+            cols_null = df_check.columns[df_check.isnull().any()].tolist()
+            estado_str += f" [!] {nulos} nulos en {cols_null}"
+            errores.append(nombre)
+
+        print(f"  {nombre:<22} {df_check.shape[0]:>8,}  {nulos:>6}  {cols:>5}  {estado_str}")
+
+        if nombre.startswith("X_"):
+            total_filas += df_check.shape[0]
+
+    print("  " + "-" * 55)
+    print(f"  {'Total filas X_*':<22} {total_filas:>8,}")
+    print()
+
+    if errores:
+        print(f"  [ATENCION] Problemas detectados en: {errores}")
+    else:
+        print("  Todos los splits son correctos: sin nulos, filas cuadran con master.")
+
+    print("=" * 60)
     print("Script 04 completado.\n")
 
 
